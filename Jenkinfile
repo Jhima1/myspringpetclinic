@@ -1,0 +1,85 @@
+pipeline{
+    agent any
+    environment {
+        PROJECT_ID = 'speedy-baton-262613'
+        CLUSTER_NAME = 'capstone-cluster'
+        LOCATION = 'us-central1-a'
+        CREDENTIALS_ID = 'gke-capstone'
+        NAMESPACE = 'capstone'
+    }
+    stages {
+	stage ('Artifactory configuration') {
+            steps {
+                rtMavenDeployer (
+                    id: "MAVEN_DEPLOYER",
+                    serverId: "artifactory",
+                    releaseRepo: "libs-release-local",
+                    snapshotRepo: "libs-snapshot-local"
+                )
+
+                rtMavenResolver (
+                    id: "MAVEN_RESOLVER",
+                    serverId: "artifactory",
+                    releaseRepo: "libs-release",
+                    snapshotRepo: "libs-snapshot"
+                )
+            }
+        }
+	stage ('Exec Maven') {
+            steps {
+                rtMavenRun (
+                    tool: 'maven',
+                    pom: 'pom.xml',
+                    goals: 'clean package -Dmaven.test.skip=true',
+                    deployerId: "MAVEN_DEPLOYER",
+                    resolverId: "MAVEN_RESOLVER"
+                )
+            }
+        }
+        stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: "artifactory"
+                )
+            }
+        }
+	stage('SonarQube analysis') {
+            environment {
+                scannerHome = tool 'sonarscanner'
+            }
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
+        //stage('Dcoker Deploy') {
+          //  steps {
+                // sh 'cd /home/jnaidu023/capstone/spring-petclinic'
+	//			sh "docker image build -t petclinic ."
+	//			sh "docker container stop petclinic | true"
+	//			sh "docker container rm petclinic | true"
+	//			sh "docker container run -d --name petclinic --link mysql:mysql -p 8085:8080 petclinic"
+          //      }
+        //}
+	stage('Docker Build and Push') {
+            steps {
+                script {
+                    myapp = docker.build("jnaidu023/petclinic:${env.BUILD_ID}")
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker_credential') {
+                        myapp.push("latest")
+                        myapp.push("${env.BUILD_ID}")
+                    }
+                }
+                sh "docker image prune -a -f"
+            }
+        }
+	stage('Deploy to GKE') {
+            steps{
+                sh "sed -i 's/petclinic:latest/petclinic:${env.BUILD_ID}/g' k8s-deployment.yml"
+                step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'k8s-deployment.yml', credentialsId: env.CREDENTIALS_ID, namespace: env.NAMESPACE, verifyDeployments: true])
+            }
+        }
+        }
+}
+
