@@ -55,25 +55,27 @@ pipeline{
                 }
             }
         }
-        //stage('Dcoker Deploy') {
-          //  steps {
-                // sh 'cd /home/jnaidu023/capstone/spring-petclinic'
-	//			sh "docker image build -t petclinic ."
-	//			sh "docker container stop petclinic | true"
-	//			sh "docker container rm petclinic | true"
-	//			sh "docker container run -d --name petclinic --link mysql:mysql -p 8085:8080 petclinic"
-          //      }
-        //}
-	stage('Docker Build and Push') {
+	stage('Docker Build') {
             steps {
                 script {
-                    myapp = docker.build("jnaidu023/petclinic:${env.BUILD_ID}")
+                    docker.build("jnaidu023/petclinic:${env.BUILD_ID}")
+                }
+            }
+        }
+        stage('Functional Testing') {
+	        steps{
+	            sh "docker run --name petclinic -d -p 80:80 jnaidu023/petclinic:${env.BUILD_ID}"
+		        sh "pytest -v -s --html=functional_result.html testing/test_pytest.py"
+	        }
+	    }
+	    stage('Pushing Docker Image to DockerHub') {
+            steps {
+                script {
                     docker.withRegistry('https://registry.hub.docker.com', 'docker_credential') {
-                        myapp.push("latest")
-                        myapp.push("${env.BUILD_ID}")
+                        docker.image("jnaidu023/petclinic:${env.BUILD_ID}").push()
+                        docker.image("jnaidu023/petclinic:${env.BUILD_ID}").push("latest")
                     }
                 }
-                sh "docker image prune -a -f"
             }
         }
 	stage('Deploy to GKE') {
@@ -85,6 +87,9 @@ pipeline{
         }
         post {
             always {
+		sh "docker stop petclinic | true"
+		sh "docker rm petclinic | true"
+		sh "docker image prune -a -f | true"
                 slackSend channel: '#petclinic',
                     color: COLOR_MAP[currentBuild.currentResult],
                     message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}"
