@@ -39,4 +39,4 @@ spec:
       targetPort: 8080
   selector:
     name: spring-petclinic-pod
-  type: LoadBalancer
+  type: NodePort
