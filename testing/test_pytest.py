@@ -11,7 +11,7 @@ driver=webdriver.Chrome("./testing/chromedriver", options=option)
 #driver=webdriver.Chrome("/home/devops/Capstone/testing/chromedriver.exe", options=option)
 #driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver.exe")
 driver.implicitly_wait(5)                         
-driver.get('http://localhost:83')
+driver.get('http://localhost:8083')
 driver.maximize_window()
 print(driver.title)
 assert driver.title=="PetClinic :: a Spring Framework demonstration","Title not matched"
