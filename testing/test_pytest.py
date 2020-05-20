@@ -14,7 +14,7 @@ driver.implicitly_wait(5)
 driver.get('http://localhost:83')
 driver.maximize_window()
 print(driver.title)
-assert driver.title=='PetClinic :: a Spring Framework demonstration','Title not matched'
+assert driver.title=="PetClinic :: a Spring Framework demonstration","Title not matched"
 print("Login Test successfull")
 driver.close()
 driver.quit()
