@@ -20,6 +20,7 @@ def initial_check():
     print(driver.title)
     
 def title_check():
+    global driver
     #assert (driver.title=='PetClinic :: a Spring Framework demonstration'), 'Title not matched'
     #driver.implicitly_wait(10)
     assert (driver.title == 'PetClinic :: a Spring Framework demonstration'), 'title not matched'
