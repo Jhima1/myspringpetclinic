@@ -15,7 +15,7 @@ driver.get('http://192.168.56.120:8083')
 driver.implicitly_wait(10) 
 driver.maximize_window()
 print(driver.title)
-assert driver.title=="PetClinic :: a Spring Framework demonstration","Title not matched"
+assert (driver.title=='PetClinic :: a Spring Framework demonstration'), 'Title not matched'
 driver.implicitly_wait(10)
 print("Login Test successfull")
 driver.close()
