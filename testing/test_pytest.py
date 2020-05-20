@@ -15,7 +15,7 @@ def test_title_check():
     #driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver.exe")
     driver.implicitly_wait(15)                         
     driver.get('http://192.168.56.120:8083')
-    driver.implicitly_wait(10) 
+    #driver.implicitly_wait(10) 
     driver.maximize_window()
     print(driver.title)
     #assert (driver.title=='PetClinic :: a Spring Framework demonstration'), 'Title not matched'
