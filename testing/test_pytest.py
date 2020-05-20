@@ -1,4 +1,4 @@
-from selenium import webdriver
+from selenium import web driver
 from selenium.webdriver.chrome.options import Options
 option=Options()
 option.add_argument("--headless")
