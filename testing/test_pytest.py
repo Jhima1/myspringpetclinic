@@ -19,6 +19,7 @@ print(driver.title)
 #driver.implicitly_wait(10)
 
 def test_title_check():
+    global driver
     assert (driver.title == 'PetClinic :: a Spring Framework demonstration'), 'title not matched'
     driver.close()
 #print("Login Test successfull")
