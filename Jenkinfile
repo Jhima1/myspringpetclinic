@@ -79,10 +79,10 @@ pipeline{
         }
         post {
             always {
-		sh "docker stop petclinic | true"
-		sh "docker rm petclinic | true"
-		sh "docker image prune -a -f | true"
-                slackSend channel: '#petclinic',
+		//sh "docker stop petclinic | true"
+		//sh "docker rm petclinic | true"
+		//sh "docker image prune -a -f | true"
+                //slackSend channel: '#petclinic',
                     color: COLOR_MAP[currentBuild.currentResult],
                     message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}"
             }
