@@ -59,8 +59,8 @@ pipeline{
 	        steps{
 	            sh "docker run --name petclinic -d -p 8083:8080 jnaidu023/petclinic:${env.BUILD_ID}"
 		    sh "sleep 15"
-		        sh "pytest -v -s --html=functional_result.html testing/test_pytest.py"
-			//sh "python3 testing/chrome_get_title.py"
+		        //sh "pytest -v -s --html=functional_result.html testing/test_pytest.py"
+			sh "python3 testing/chrome_get_title.py"
 	        }
 	    }
 	    stage('Pushing Docker Image to DockerHub') {
