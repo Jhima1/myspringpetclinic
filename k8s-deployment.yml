@@ -23,7 +23,7 @@ spec:
           image: jnaidu023/petclinic:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 80
+            - containerPort: 8080
 
 ---
 apiVersion: v1
