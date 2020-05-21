@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from selenium.webdriver import Chrome import urllib3
+from selenium.webdriver import Chrome import selenium.urllib3
 from selenium.webdriver.chrome.options import Options
 
 opts = Options()
