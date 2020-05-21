@@ -19,6 +19,7 @@ def initial_check():
     driver.maximize_window()
     print(driver.title)
     assert 'PetClinic :: a Spring Framework demonstration' == driver.title
+    print("Success")
     #assert (driver.title=='PetClinic :: a Spring Framework demonstration'), 'Title not matched'
     #driver.implicitly_wait(10)
     #assert (driver.title == 'PetClinic :: a Spring Framework demonstration'), 'title not matched'
