@@ -1,4 +1,5 @@
 from selenium import webdriver
+import time
 from selenium.webdriver.chrome.options import Options
 option=Options()
 option.add_argument("--headless")
@@ -13,7 +14,8 @@ def initial_check():
     driver=webdriver.Chrome("./testing/chromedriver", options=option)
     #driver=webdriver.Chrome("/home/devops/Capstone/testing/chromedriver.exe", options=option)
     #driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver.exe")
-    driver.implicitly_wait(15)                         
+    driver.implicitly_wait(15)
+    time.sleep(10)
     driver.get('http://192.168.56.120:8083')
     #driver.implicitly_wait(10) 
     driver.maximize_window()
