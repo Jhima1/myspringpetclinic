@@ -59,7 +59,7 @@ pipeline{
 	        steps{
 	            sh "docker run --name petclinic -d -p 8083:8080 jnaidu023/petclinic:${env.BUILD_ID}"
 		    //sh "python3 testing/test_pytest.py"
-		    sh "python3 testing/test_pytest.py"
+		    sh "python testing/test_pytest.py"
 	        }
 	    }
 	    stage('Pushing Docker Image to DockerHub') {
