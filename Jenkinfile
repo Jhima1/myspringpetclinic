@@ -26,7 +26,7 @@ pipeline{
                     tool: 'maven',
                     pom: 'pom.xml',
                     goals: 'clean package -Dmaven.test.failure.ignore=true',
-		    goals: 'clean package',
+		    //goals: 'clean package',
                     deployerId: "MAVEN_DEPLOYER",
                     resolverId: "MAVEN_RESOLVER"
                 )
