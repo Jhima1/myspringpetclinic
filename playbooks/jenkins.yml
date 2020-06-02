@@ -1,0 +1,23 @@
+- hosts: localhost
+  become: true
+  tasks:
+    - name: Ensure the jenkins apt repository key is installed
+      apt_key: 
+        url: https://pkg.jenkins.io/debian/jenkins-ci.org.key 
+        state: present
+    - name: Ensure the repository is configured
+      apt_repository: 
+        repo: 'deb http://pkg.jenkins.io/debian-stable binary/'
+        state: present
+    - name: Ensure jenkins is installed
+      apt:
+        name: jenkins
+        state: present
+        update_cache: yes
+        
+   
+    - name: Ensure Jenkins service is running
+      service:
+        name: jenkins
+        state: started
+

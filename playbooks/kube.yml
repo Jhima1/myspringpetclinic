@@ -1,0 +1,84 @@
+- hosts: kube-cluster
+  become: true
+  vars: 
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Install the Docker
+      include_tasks: docker.yml
+      
+    - name: Download the GPG Key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+    - name: Adding the kubernetes repository
+      apt_repository:
+        repo: 'deb http://apt.kubernetes.io/ kubernetes-xenial main' 
+        state: present
+        filename: kubernetes.list
+    - name: Installing the Kubeadm kubelet Kubectl
+      apt: 
+        name: ['kubelet', 'kubeadm','kubectl']
+        state: present
+
+- hosts: master
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks: 
+    - name: Initialize the Kubernetes cluster using kubeadm
+      become: true
+      command: "kubeadm init  --pod-network-cidr=192.168.0.0/16 "
+
+    - name: Setup the kubeconfig for ansible user
+      become: true
+      file: 
+        path: $HOME/.kube
+        state: directory
+        owner: jnaidu1016
+        group: jnaidu1016
+
+    - name: copiyng config file
+      become: true
+      copy: 
+        src: /etc/kubernetes/admin.conf
+        dest: $HOME/.kube/config
+        owner: jnaidu1016
+        group: jnaidu1016
+
+    - name: Installing Pod Network add-on
+      become: true
+      command: "{{ item }}"
+      with_items:
+        - swapoff -a
+        - kubectl apply -f https://docs.projectcalico.org/v3.3/gettingstarted/kubernetes/installation/hosted/kubernetes-datastore/caliconetworking/1.7/calico.yaml
+
+    - name: Configure node ip
+      lineinfile:
+        path: /etc/default/kubelet
+        line: KUBELET_EXTRA_ARGS=--node-ip={{ node_ip }}
+
+    - name: Restart kubelet 
+      service: 
+        name: kubelet
+        daemon_reload: yes
+        state: restarted
+
+    - name: Generate join command
+      become: true
+      command: kubeadm token create --print-join-command
+      register: join_command
+
+    - name: Copy the Join command to local file
+      local_action: copy content= "{{ join_command.stdout_lines[0] }}" dest= "./join-command"
+
+
+
+- hosts: node
+  become: true
+  tasks: 
+    - name: Copy the join command to server location
+      copy: src=join-command dest=/tmp/join-command.sh mode=0777
+ 
+    - name: Join the node to cluster
+      command: sh /tmp/join-command.sh
+    

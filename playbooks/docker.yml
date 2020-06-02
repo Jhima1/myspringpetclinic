@@ -1,0 +1,19 @@
+- hosts: localhost
+  become: true
+  tasks:
+    - name: Install git
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+    - name: Add Docker GPG Key
+      apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+    - name: Add Docker APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
+    - name: Install list of packages
+      apt:
+        name: ['apt-transport-https','ca-certificates','curl','gnupg-agent','software-properties-common','docker-ce','docker-ce-cli'
+,'containerd.io']
+        state: present
+        update_cache: yes

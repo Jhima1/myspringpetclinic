@@ -1,0 +1,24 @@
+- hosts: localhost
+  become: true
+  tasks:
+    - name: Create a user artifactory
+      user:
+        name: artifactory
+        comment: Artifactory user
+        uid: 1030
+        
+    - name: To create the directory
+      file:
+        path: /jfrog/artifactory
+        state: directory
+        mode: "0755"
+        owner: artifactory
+        
+    - name: To create the artifactory container
+      docker_container: 
+        name: artifactory
+        image: docker.bintray.io/jfrog/artifactory-oss:latest
+        volumes: 
+          - /jfrog/artifactory:/var/opt/jfrog/artifactory
+        ports: 
+          - "8081:8081"
