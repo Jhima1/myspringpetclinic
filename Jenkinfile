@@ -25,8 +25,8 @@ pipeline{
                 rtMavenRun (
                     tool: 'maven',
                     pom: 'pom.xml',
-                    goals: 'clean package -Dmaven.test.skip=true',
-		    //goals: 'clean package',
+                    #goals: 'clean package -Dmaven.test.skip=true',
+		    goals: 'clean package',
                     deployerId: "MAVEN_DEPLOYER",
                     resolverId: "MAVEN_RESOLVER"
                 )
