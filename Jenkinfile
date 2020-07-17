@@ -12,42 +12,28 @@ pipeline{
             		sh "${scannerHome}/bin/sonar-scanner"
        		 }
     	}
+	stage('Build') {
+            steps {
+	        sh 'mvn clean package'
+            }
+        }
+	stage('Pushing artifacts to Artifactory') {
+	    steps {
+                rtUpload (
+                    serverId: 'artifactory',
+                    spec: '''{
+                        "files": [
+                            {
+                                "pattern": "target/*.jar",
+                                "target": "libs-snapshot-local"
+                            }
+                        ]
+                    }''',
+                    buildName: "${env.JOB_NAME}",
+                    buildNumber: "${env.BUILD_NUMBER}" 
+                )
+	    }
 	}
-	stage ('Artifactory configuration') {
-            steps {
-                rtMavenDeployer (
-                    id: "MAVEN_DEPLOYER",
-                    serverId: "artifactory",
-                    releaseRepo: "libs-release-local",
-                    snapshotRepo: "libs-snapshot-local"
-                )
-
-                rtMavenResolver (
-                    id: "MAVEN_RESOLVER",
-                    serverId: "artifactory",
-                    releaseRepo: "libs-release",
-                    snapshotRepo: "libs-snapshot"
-                )
-            }
-        }
-	stage ('Exec Maven') {
-            steps {
-                rtMavenRun (
-                    tool: 'maven',
-                    pom: 'pom.xml',
-                    goals: 'clean package',
-                    deployerId: "MAVEN_DEPLOYER",
-                    resolverId: "MAVEN_RESOLVER"
-                )
-            }
-        }
-        stage ('Publish build info') {
-            steps {
-                rtPublishBuildInfo (
-                    serverId: "artifactory"
-                )
-            }
-        }
 	stage('Docker Build') {
             steps {
                 script {
