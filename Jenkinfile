@@ -3,6 +3,16 @@ def COLOR_MAP = ['SUCCESS': 'good', 'FAILURE': 'danger', 'UNSTABLE': 'danger', '
 pipeline{
     agent any
     stages{
+	stage('SonarQube analysis') {
+ 	   environment {
+        	scannerHome = tool 'sonarscanner'
+   	 	}	
+    	    steps {
+        	withSonarQubeEnv('SonarQube') {
+            		sh "${scannerHome}/bin/sonar-scanner"
+       		 }
+    	}
+	}
 	stage ('Artifactory configuration') {
             steps {
                 rtMavenDeployer (
@@ -36,16 +46,6 @@ pipeline{
                 rtPublishBuildInfo (
                     serverId: "artifactory"
                 )
-            }
-        }
-	stage('SonarQube analysis') {
-            environment {
-                scannerHome = tool 'sonarscanner'
-            }
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh "${scannerHome}/bin/sonar-scanner"
-                }
             }
         }
 	stage('Docker Build') {
