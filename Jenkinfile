@@ -12,6 +12,7 @@ pipeline{
             		sh "${scannerHome}/bin/sonar-scanner"
        		 }
     	}
+	}
 	stage('Build') {
             steps {
 	        sh 'mvn clean package'
