@@ -1,0 +1,35 @@
+
+
+pipeline{
+    agent any
+    stages{
+	
+	stage('Build') {
+            steps {
+	        sh 'mvn clean package -U'
+            }
+        }
+	
+	stage('Docker Build') {
+            steps {
+                script {
+                    docker.build("jnaidu023/petclinic:${env.BUILD_ID}")
+                }
+            }
+        }
+       
+	    stage('Pushing Docker Image to DockerHub') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker_credential') {
+                        docker.image("jnaidu023/petclinic:${env.BUILD_ID}").push()
+                        docker.image("jnaidu023/petclinic:${env.BUILD_ID}").push("latest")
+                    }
+                }
+            }
+        }
+	
+        }
+        
+}
+
