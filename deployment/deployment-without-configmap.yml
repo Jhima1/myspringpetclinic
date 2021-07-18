@@ -21,25 +21,7 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
-          volumeMounts:
-            - name: config-volume
-              mountPath: "/config"
-          resources:
-            requests:
-              memory: "300Mi"
-              cpu: "200m"
-            limits:
-              memory: "600Mi"
-              cpu: "400m"
-      volumes:
-      - name: config-volume
-        configMap:
-          name: petclinic
-          items:
-          - key: application
-            path: application.properties
-
-
+          
 ---
 apiVersion: v1
 kind: Service
